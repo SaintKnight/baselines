@@ -17,6 +17,7 @@ import tensorflow as tf
 from mpi4py import MPI
 
 def run(env_id, seed, noise_type, layer_norm, evaluation, **kwargs):
+    print "blablablablablablablablablablablablablablablablablablablablablablablablablablablablablabla"
     # Configure things.
     rank = MPI.COMM_WORLD.Get_rank()
     if rank != 0:
