@@ -1,6 +1,7 @@
 import tensorflow as tf
 import tensorflow.contrib as tc
 
+HAS_SCOPE = False
 
 class Model(object):
     def __init__(self, name):
@@ -26,9 +27,12 @@ class Actor(Model):
         self.layer_norm = layer_norm
 
     def __call__(self, obs, reuse=False):
-        with tf.variable_scope(self.name) as scope:
-            if reuse:
+        global HAS_SCOPE
+        with tf.variable_scope('firstshare') as scope:
+            if HAS_SCOPE:
                 scope.reuse_variables()
+            else:
+                HAS_SCOPE = True
 
             x = obs
             x = tf.layers.dense(x, 64)
@@ -36,6 +40,10 @@ class Actor(Model):
                 x = tc.layers.layer_norm(x, center=True, scale=True)
             x = tf.nn.relu(x)
             
+        with tf.variable_scope(self.name) as scope:
+            if reuse:
+                scope.reuse_variables()
+
             x = tf.layers.dense(x, 64)
             if self.layer_norm:
                 x = tc.layers.layer_norm(x, center=True, scale=True)
@@ -52,9 +60,12 @@ class Critic(Model):
         self.layer_norm = layer_norm
 
     def __call__(self, obs, action, reuse=False):
-        with tf.variable_scope(self.name) as scope:
-            if reuse:
+        global HAS_SCOPE
+        with tf.variable_scope('firstshare') as scope:
+            if HAS_SCOPE:
                 scope.reuse_variables()
+            else:
+                HAS_SCOPE = True
 
             x = obs
             x = tf.layers.dense(x, 64)
@@ -62,6 +73,10 @@ class Critic(Model):
                 x = tc.layers.layer_norm(x, center=True, scale=True)
             x = tf.nn.relu(x)
 
+        with tf.variable_scope(self.name) as scope:
+            if reuse:
+                scope.reuse_variables()
+                
             x = tf.concat([x, action], axis=-1)
             x = tf.layers.dense(x, 64)
             if self.layer_norm:
