@@ -65,6 +65,8 @@ def train(env, nb_epochs, nb_epoch_cycles, render_eval, reward_scale, render, pa
         epoch_actions = []
         epoch_qs = []
         epoch_episodes = 0
+
+        epireward = []
         for epoch in range(nb_epochs):
             for cycle in range(nb_epoch_cycles):
                 # Perform rollouts.
@@ -95,6 +97,7 @@ def train(env, nb_epochs, nb_epoch_cycles, render_eval, reward_scale, render, pa
                         epoch_episode_rewards.append(episode_reward)
                         episode_rewards_history.append(episode_reward)
                         epoch_episode_steps.append(episode_step)
+                        epireward.append(np.mean(episode_rewards_history))
                         episode_reward = 0.
                         episode_step = 0
                         epoch_episodes += 1
@@ -102,6 +105,10 @@ def train(env, nb_epochs, nb_epoch_cycles, render_eval, reward_scale, render, pa
 
                         agent.reset()
                         obs = env.reset()
+
+                        if episodes >= 500:
+                            print ("blablablablablablablablablablablablablablablablablablablablablablablablablablablablablabla")
+                            print (epireward)
 
                 # Train.
                 epoch_actor_losses = []
