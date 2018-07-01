@@ -124,7 +124,11 @@ class DDPG(object):
 
         # Create target networks.
         target_actor = copy(actor)
+        print ('aaaaa1')
+        print (target_actor.vars)
         target_actor.name = 'target_actor'
+        print ('aaaaa2')
+        print (target_actor.vars)
         target_actor.first_scope = 'first_target_actor_scope'
 
 
