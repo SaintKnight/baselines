@@ -1,9 +1,6 @@
 import tensorflow as tf
 import tensorflow.contrib as tc
 
-#HAS_SCOPE = {}
-HAS_SCOPE = False
-
 class Model(object):
     def __init__(self, name):
         self.name = name
@@ -11,7 +8,7 @@ class Model(object):
     @property
     def vars(self):
         if self.name == 'critic' or self.name == 'actor':
-            result = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='sharefirst') + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name)# + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.first_scope)
+            result = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='sharefirst') + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name)
         else:
             result = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name)
         return result
@@ -19,7 +16,7 @@ class Model(object):
     @property
     def trainable_vars(self):
         if self.name == 'critic' or self.name == 'actor':
-            result = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='sharefirst') + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)# + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.first_scope)
+            result = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='sharefirst') + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
         else:
             result = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
         return result
@@ -34,16 +31,10 @@ class Actor(Model):
         super(Actor, self).__init__(name=name)
         self.nb_actions = nb_actions
         self.layer_norm = layer_norm
-        self.first_scope = 'general_scope'
 
-    def __call__(self, obs, reuse=False, FS=False):
-        global HAS_SCOPE
+    def __call__(self, obs, reuse=False):
         if self.name == 'actor':
             with tf.variable_scope('sharefirst', reuse=tf.AUTO_REUSE) as scope:
-                # if HAS_SCOPE:
-                #     scope.reuse_variables()
-                # else:
-                #     HAS_SCOPE = True
                 x = obs
                 x = tf.layers.dense(x, 64)
                 if self.layer_norm:
@@ -86,16 +77,10 @@ class Critic(Model):
     def __init__(self, name='critic', layer_norm=True):
         super(Critic, self).__init__(name=name)
         self.layer_norm = layer_norm
-        self.first_scope = 'general_scope'
 
-    def __call__(self, obs, action, reuse=False, FS=False):
-        global HAS_SCOPE
+    def __call__(self, obs, action, reuse=False):
         if self.name == 'critic':
             with tf.variable_scope('sharefirst', reuse=tf.AUTO_REUSE) as scope:
-                # if HAS_SCOPE:
-                #     scope.reuse_variables()
-                # else:
-                #     HAS_SCOPE = True
                 x = obs
                 x = tf.layers.dense(x, 64)
                 if self.layer_norm:

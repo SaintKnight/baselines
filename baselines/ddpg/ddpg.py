@@ -11,8 +11,6 @@ import baselines.common.tf_util as U
 from baselines.common.mpi_running_mean_std import RunningMeanStd
 from mpi4py import MPI
 
-# from models import HAS_SCOPE
-
 def normalize(x, stats):
     if stats is None:
         return x
@@ -47,9 +45,6 @@ def get_target_updates(vars, target_vars, tau):
 
 
 def get_perturbed_actor_updates(actor, perturbed_actor, param_noise_stddev):
-    print (actor.vars)
-    print ('bla5')
-    print (perturbed_actor.vars)
     assert len(actor.vars) == len(perturbed_actor.vars)
     assert len(actor.perturbable_vars) == len(perturbed_actor.perturbable_vars)
 
@@ -120,29 +115,19 @@ class DDPG(object):
         else:
             self.ret_rms = None
 
-        # global HAS_SCOPE
-
         # Create target networks.
         target_actor = copy(actor)
-        print ('aaaaa1')
-        print (target_actor.vars)
         target_actor.name = 'target_actor'
-        print ('aaaaa2')
-        print (target_actor.vars)
-        target_actor.first_scope = 'first_target_actor_scope'
-
-
         self.target_actor = target_actor
         target_critic = copy(critic)
         target_critic.name = 'target_critic'
-        target_critic.first_scope = 'first_target_critic_scope'
         self.target_critic = target_critic
 
         # Create networks and core TF parts that are shared across setup parts.
-        self.actor_tf = actor(normalized_obs0, FS=True)
-        self.normalized_critic_tf = critic(normalized_obs0, self.actions, FS=True)
+        self.actor_tf = actor(normalized_obs0)
+        self.normalized_critic_tf = critic(normalized_obs0, self.actions)
         self.critic_tf = denormalize(tf.clip_by_value(self.normalized_critic_tf, self.return_range[0], self.return_range[1]), self.ret_rms)
-        self.normalized_critic_with_actor_tf = critic(normalized_obs0, self.actor_tf, reuse=True, FS=True)
+        self.normalized_critic_with_actor_tf = critic(normalized_obs0, self.actor_tf, reuse=True)
         self.critic_with_actor_tf = denormalize(tf.clip_by_value(self.normalized_critic_with_actor_tf, self.return_range[0], self.return_range[1]), self.ret_rms)
         Q_obs1 = denormalize(target_critic(normalized_obs1, target_actor(normalized_obs1)), self.ret_rms)
         self.target_Q = self.rewards + (1. - self.terminals1) * gamma * Q_obs1
@@ -158,10 +143,6 @@ class DDPG(object):
         self.setup_target_network_updates()
 
     def setup_target_network_updates(self):
-        print ('ccccc1')
-        print (self.actor.vars)
-        print (self.target_actor.vars)
-        print ('ccccc2')
         actor_init_updates, actor_soft_updates = get_target_updates(self.actor.vars, self.target_actor.vars, self.tau)
         critic_init_updates, critic_soft_updates = get_target_updates(self.critic.vars, self.target_critic.vars, self.tau)
         self.target_init_updates = [actor_init_updates, critic_init_updates]
@@ -172,24 +153,14 @@ class DDPG(object):
 
         # Configure perturbed actor.
         param_noise_actor = copy(self.actor)
-        print ("bla1")
-        print (param_noise_actor.vars)
         param_noise_actor.name = 'param_noise_actor'
-        print ("bla2")
-        print (param_noise_actor.vars)
-        param_noise_actor.first_scope = 'first_param_noise_actor_scope'
-        print ("bla3")
-        print (param_noise_actor.vars)
         self.perturbed_actor_tf = param_noise_actor(normalized_obs0)
-        print ("bla4")
-        print (param_noise_actor.vars)
         logger.info('setting up param noise')
         self.perturb_policy_ops = get_perturbed_actor_updates(self.actor, param_noise_actor, self.param_noise_stddev)
 
         # Configure separate copy for stddev adoption.
         adaptive_param_noise_actor = copy(self.actor)
         adaptive_param_noise_actor.name = 'adaptive_param_noise_actor'
-        adaptive_param_noise_actor.first_scope = 'first_adaptive_param_noise_actor_scope'
         adaptive_actor_tf = adaptive_param_noise_actor(normalized_obs0)
         self.perturb_adaptive_policy_ops = get_perturbed_actor_updates(self.actor, adaptive_param_noise_actor, self.param_noise_stddev)
         self.adaptive_policy_distance = tf.sqrt(tf.reduce_mean(tf.square(self.actor_tf - adaptive_actor_tf)))
