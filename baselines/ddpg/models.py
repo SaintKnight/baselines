@@ -39,11 +39,11 @@ class Actor(Model):
     def __call__(self, obs, reuse=False, FS=False):
         global HAS_SCOPE
         if self.name == 'actor':
-            with tf.variable_scope('sharefirst') as scope:
-                if HAS_SCOPE:
-                    scope.reuse_variables()
-                else:
-                    HAS_SCOPE = True
+            with tf.variable_scope('sharefirst', reuse=tf.AUTO_REUSE) as scope:
+                # if HAS_SCOPE:
+                #     scope.reuse_variables()
+                # else:
+                #     HAS_SCOPE = True
                 x = obs
                 x = tf.layers.dense(x, 64)
                 if self.layer_norm:
@@ -91,11 +91,11 @@ class Critic(Model):
     def __call__(self, obs, action, reuse=False, FS=False):
         global HAS_SCOPE
         if self.name == 'critic':
-            with tf.variable_scope('sharefirst') as scope:
-                if HAS_SCOPE:
-                    scope.reuse_variables()
-                else:
-                    HAS_SCOPE = True
+            with tf.variable_scope('sharefirst', reuse=tf.AUTO_REUSE) as scope:
+                # if HAS_SCOPE:
+                #     scope.reuse_variables()
+                # else:
+                #     HAS_SCOPE = True
                 x = obs
                 x = tf.layers.dense(x, 64)
                 if self.layer_norm:
