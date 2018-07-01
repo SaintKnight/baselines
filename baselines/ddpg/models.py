@@ -38,18 +38,7 @@ class Actor(Model):
 
     def __call__(self, obs, reuse=False, FS=False):
         global HAS_SCOPE
-        '''with tf.variable_scope(self.first_scope) as scope:
-            if self.first_scope in HAS_SCOPE:
-                scope.reuse_variables()
-            else:
-                HAS_SCOPE[self.first_scope] = True
-
-            x = obs
-            x = tf.layers.dense(x, 64)
-            if self.layer_norm:
-                x = tc.layers.layer_norm(x, center=True, scale=True)
-            x = tf.nn.relu(x)'''
-        if FS:
+        if self.name == 'actor':
             with tf.variable_scope('sharefirst') as scope:
                 if HAS_SCOPE:
                     scope.reuse_variables()
@@ -82,11 +71,6 @@ class Actor(Model):
                     x = tc.layers.layer_norm(x, center=True, scale=True)
                 x = tf.nn.relu(x)
 
-            
-        # with tf.variable_scope(self.name) as scope:
-        #     if reuse:
-        #         scope.reuse_variables()
-
                 x = tf.layers.dense(x, 64)
                 if self.layer_norm:
                     x = tc.layers.layer_norm(x, center=True, scale=True)
@@ -106,18 +90,7 @@ class Critic(Model):
 
     def __call__(self, obs, action, reuse=False, FS=False):
         global HAS_SCOPE
-        '''with tf.variable_scope(self.first_scope) as scope:
-            if self.first_scope in HAS_SCOPE:
-                scope.reuse_variables()
-            else:
-                HAS_SCOPE[self.first_scope] = True
-
-            x = obs
-            x = tf.layers.dense(x, 64)
-            if self.layer_norm:
-                x = tc.layers.layer_norm(x, center=True, scale=True)
-            x = tf.nn.relu(x)'''
-        if FS:
+        if self.name == 'critic':
             with tf.variable_scope('sharefirst') as scope:
                 if HAS_SCOPE:
                     scope.reuse_variables()
@@ -150,11 +123,6 @@ class Critic(Model):
                 if self.layer_norm:
                     x = tc.layers.layer_norm(x, center=True, scale=True)
                 x = tf.nn.relu(x)
-
-
-        # with tf.variable_scope(self.name) as scope:
-        #     if reuse:
-        #         scope.reuse_variables()
 
                 x = tf.concat([x, action], axis=-1)
                 x = tf.layers.dense(x, 64)
