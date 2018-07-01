@@ -9,11 +9,11 @@ class Model(object):
 
     @property
     def vars(self):
-        return tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.first_scope)
+        return tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="shareFirst")
 
     @property
     def trainable_vars(self):
-        return tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.first_scope)
+        return tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="shareFirst")
 
     @property
     def perturbable_vars(self):
@@ -26,23 +26,29 @@ class Actor(Model):
         self.nb_actions = nb_actions
         self.layer_norm = layer_norm
         self.first_scope = 'general_scope'
-        global HAS_SCOPE
-        # HAS_SCOPE[self.first_scope]
 
-    def __call__(self, obs, reuse=False):
+    def __call__(self, obs, reuse=False, shareFirst=False):
         global HAS_SCOPE
-        with tf.variable_scope(self.first_scope) as scope:
-            if self.first_scope == 'general_scope' and HAS_SCOPE:
-                scope.reuse_variables()
-            elif self.first_scope == 'general_scope':
-                HAS_SCOPE = True
-            elif reuse:
-                scope.reuse_variables()
-            x = obs
-            x = tf.layers.dense(x, 64)
-            if self.layer_norm:
-                x = tc.layers.layer_norm(x, center=True, scale=True)
-            x = tf.nn.relu(x)
+        if shareFirst:
+            with tf.variable_scope("shareFirst") as scope:
+                if HAS_SCOPE:
+                    scope.reuse_variables()
+                else:
+                    HAS_SCOPE = True
+                x = obs
+                x = tf.layers.dense(x, 64)
+                if self.layer_norm:
+                    x = tc.layers.layer_norm(x, center=True, scale=True)
+                x = tf.nn.relu(x)
+        else:
+            with tf.variable_scope(self.name) as scope:
+                if reuse:
+                    scope.reuse_variables()
+                x = obs
+                x = tf.layers.dense(x, 64)
+                if self.layer_norm:
+                    x = tc.layers.layer_norm(x, center=True, scale=True)
+                x = tf.nn.relu(x)
             
         with tf.variable_scope(self.name) as scope:
             if reuse:
@@ -66,19 +72,26 @@ class Critic(Model):
 
     def __call__(self, obs, action, reuse=False):
         global HAS_SCOPE
-        with tf.variable_scope(self.first_scope) as scope:
-            if self.first_scope == 'general_scope' and HAS_SCOPE:
-                scope.reuse_variables()
-            elif self.first_scope == 'general_scope':
-                HAS_SCOPE = True
-            elif reuse:
-                scope.reuse_variables()
-
-            x = obs
-            x = tf.layers.dense(x, 64)
-            if self.layer_norm:
-                x = tc.layers.layer_norm(x, center=True, scale=True)
-            x = tf.nn.relu(x)
+        if shareFirst:
+            with tf.variable_scope("shareFirst") as scope:
+                if HAS_SCOPE:
+                    scope.reuse_variables()
+                else:
+                    HAS_SCOPE = True
+                x = obs
+                x = tf.layers.dense(x, 64)
+                if self.layer_norm:
+                    x = tc.layers.layer_norm(x, center=True, scale=True)
+                x = tf.nn.relu(x)
+        else:
+            with tf.variable_scope(self.name) as scope:
+                if reuse:
+                    scope.reuse_variables()
+                x = obs
+                x = tf.layers.dense(x, 64)
+                if self.layer_norm:
+                    x = tc.layers.layer_norm(x, center=True, scale=True)
+                x = tf.nn.relu(x)
 
         with tf.variable_scope(self.name) as scope:
             if reuse:

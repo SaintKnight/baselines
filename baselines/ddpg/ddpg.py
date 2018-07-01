@@ -11,6 +11,8 @@ import baselines.common.tf_util as U
 from baselines.common.mpi_running_mean_std import RunningMeanStd
 from mpi4py import MPI
 
+# from models import HAS_SCOPE
+
 def normalize(x, stats):
     if stats is None:
         return x
@@ -115,10 +117,14 @@ class DDPG(object):
         else:
             self.ret_rms = None
 
+        # global HAS_SCOPE
+
         # Create target networks.
         target_actor = copy(actor)
         target_actor.name = 'target_actor'
         target_actor.first_scope = 'target_actor_scope'
+        
+
         self.target_actor = target_actor
         target_critic = copy(critic)
         target_critic.name = 'target_critic'
