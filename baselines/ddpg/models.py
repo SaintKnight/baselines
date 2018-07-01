@@ -9,11 +9,11 @@ class Model(object):
 
     @property
     def vars(self):
-        return tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='firstshare')
+        return tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.first_scope)
 
     @property
     def trainable_vars(self):
-        return tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='firstshare')
+        return tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.first_scope)
 
     @property
     def perturbable_vars(self):
@@ -25,10 +25,11 @@ class Actor(Model):
         super(Actor, self).__init__(name=name)
         self.nb_actions = nb_actions
         self.layer_norm = layer_norm
+        self.first_scope = 'general_scope'
 
     def __call__(self, obs, reuse=False):
         global HAS_SCOPE
-        with tf.variable_scope('firstshare') as scope:
+        with tf.variable_scope(self.first_scope) as scope:
             if HAS_SCOPE:
                 scope.reuse_variables()
             else:
@@ -58,10 +59,11 @@ class Critic(Model):
     def __init__(self, name='critic', layer_norm=True):
         super(Critic, self).__init__(name=name)
         self.layer_norm = layer_norm
+        self.first_scope = 'general_scope'
 
     def __call__(self, obs, action, reuse=False):
         global HAS_SCOPE
-        with tf.variable_scope('firstshare') as scope:
+        with tf.variable_scope(self.first_scope) as scope:
             if HAS_SCOPE:
                 scope.reuse_variables()
             else:
