@@ -169,7 +169,7 @@ class DDPG(object):
         param_noise_actor.name = 'param_noise_actor'
         print ("bla2")
         print (param_noise_actor.vars)
-        param_noise_actor.first_scope = 'param_noise_actor_scope'
+        param_noise_actor.first_scope = 'aram_noise_actor_scope'
         print ("bla3")
         print (param_noise_actor.vars)
         self.perturbed_actor_tf = param_noise_actor(normalized_obs0)
