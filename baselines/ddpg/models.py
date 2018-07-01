@@ -70,7 +70,7 @@ class Critic(Model):
         self.layer_norm = layer_norm
         self.first_scope = 'general_scope'
 
-    def __call__(self, obs, action, reuse=False):
+    def __call__(self, obs, action, reuse=False, shareFirst=False):
         global HAS_SCOPE
         if shareFirst:
             with tf.variable_scope("shareFirst") as scope:

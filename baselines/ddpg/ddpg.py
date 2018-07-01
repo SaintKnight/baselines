@@ -123,7 +123,7 @@ class DDPG(object):
         target_actor = copy(actor)
         target_actor.name = 'target_actor'
         target_actor.first_scope = 'target_actor_scope'
-        
+
 
         self.target_actor = target_actor
         target_critic = copy(critic)
@@ -132,10 +132,10 @@ class DDPG(object):
         self.target_critic = target_critic
 
         # Create networks and core TF parts that are shared across setup parts.
-        self.actor_tf = actor(normalized_obs0)
-        self.normalized_critic_tf = critic(normalized_obs0, self.actions)
+        self.actor_tf = actor(normalized_obs0, shareFirst = True)
+        self.normalized_critic_tf = critic(normalized_obs0, self.actions, shareFirst = True)
         self.critic_tf = denormalize(tf.clip_by_value(self.normalized_critic_tf, self.return_range[0], self.return_range[1]), self.ret_rms)
-        self.normalized_critic_with_actor_tf = critic(normalized_obs0, self.actor_tf, reuse=True)
+        self.normalized_critic_with_actor_tf = critic(normalized_obs0, self.actor_tf, reuse=True, shareFirst = True)
         self.critic_with_actor_tf = denormalize(tf.clip_by_value(self.normalized_critic_with_actor_tf, self.return_range[0], self.return_range[1]), self.ret_rms)
         Q_obs1 = denormalize(target_critic(normalized_obs1, target_actor(normalized_obs1)), self.ret_rms)
         self.target_Q = self.rewards + (1. - self.terminals1) * gamma * Q_obs1
