@@ -65,12 +65,6 @@ class Actor(Model):
                 if reuse:
                     scope.reuse_variables()
 
-                x = obs
-                x = tf.layers.dense(x, 64)
-                if self.layer_norm:
-                    x = tc.layers.layer_norm(x, center=True, scale=True)
-                x = tf.nn.relu(x)
-
                 x = tf.layers.dense(x, 64)
                 if self.layer_norm:
                     x = tc.layers.layer_norm(x, center=True, scale=True)
@@ -78,7 +72,7 @@ class Actor(Model):
                 
                 x = tf.layers.dense(x, self.nb_actions, kernel_initializer=tf.random_uniform_initializer(minval=-3e-3, maxval=3e-3))
                 x = tf.nn.tanh(x)
-                
+
         else:
             with tf.variable_scope(self.name) as scope:
                 if reuse:
@@ -93,12 +87,6 @@ class Actor(Model):
             # with tf.variable_scope(self.name) as scope:
             #     if reuse:
             #         scope.reuse_variables()
-
-                x = obs
-                x = tf.layers.dense(x, 64)
-                if self.layer_norm:
-                    x = tc.layers.layer_norm(x, center=True, scale=True)
-                x = tf.nn.relu(x)
 
                 x = tf.layers.dense(x, 64)
                 if self.layer_norm:
