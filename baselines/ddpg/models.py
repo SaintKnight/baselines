@@ -11,7 +11,7 @@ class Model(object):
     @property
     def vars(self):
         if self.name == 'critic' or self.name == 'actor':
-            result = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='sharefirst')# + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.first_scope)
+            result = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='sharefirst') + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name)# + tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.first_scope)
         else:
             result = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name)
         return result
@@ -19,7 +19,7 @@ class Model(object):
     @property
     def trainable_vars(self):
         if self.name == 'critic' or self.name == 'actor':
-            result = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name) + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='sharefirst')# + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.first_scope)
+            result = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='sharefirst') + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)# + tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.first_scope)
         else:
             result = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
         return result
