@@ -158,6 +158,10 @@ class DDPG(object):
         self.setup_target_network_updates()
 
     def setup_target_network_updates(self):
+        print ('ccccc1')
+        print (self.actor.vars)
+        print (self.target_actor.vars)
+        print ('ccccc2')
         actor_init_updates, actor_soft_updates = get_target_updates(self.actor.vars, self.target_actor.vars, self.tau)
         critic_init_updates, critic_soft_updates = get_target_updates(self.critic.vars, self.target_critic.vars, self.tau)
         self.target_init_updates = [actor_init_updates, critic_init_updates]
