@@ -49,7 +49,7 @@ class Actor(Model):
             if self.layer_norm:
                 x = tc.layers.layer_norm(x, center=True, scale=True)
             x = tf.nn.relu(x)'''
-        if self.name == 'actor':
+        if False:
             with tf.variable_scope('sharefirst') as scope:
                 if HAS_SCOPE:
                     scope.reuse_variables()
@@ -110,7 +110,7 @@ class Critic(Model):
             if self.layer_norm:
                 x = tc.layers.layer_norm(x, center=True, scale=True)
             x = tf.nn.relu(x)'''
-        if self.name == 'critic':
+        if False:
             with tf.variable_scope('sharefirst') as scope:
                 if HAS_SCOPE:
                     scope.reuse_variables()
