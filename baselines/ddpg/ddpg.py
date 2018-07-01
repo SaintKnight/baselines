@@ -125,13 +125,13 @@ class DDPG(object):
         # Create target networks.
         target_actor = copy(actor)
         target_actor.name = 'target_actor'
-        target_actor.first_scope = '_target_actor_scope'
+        target_actor.first_scope = 'first_target_actor_scope'
 
 
         self.target_actor = target_actor
         target_critic = copy(critic)
         target_critic.name = 'target_critic'
-        target_critic.first_scope = '_target_critic_scope'
+        target_critic.first_scope = 'first_target_critic_scope'
         self.target_critic = target_critic
 
         # Create networks and core TF parts that are shared across setup parts.
@@ -169,7 +169,7 @@ class DDPG(object):
         param_noise_actor.name = 'param_noise_actor'
         print ("bla2")
         print (param_noise_actor.vars)
-        param_noise_actor.first_scope = '_param_noise_actor_scope'
+        param_noise_actor.first_scope = 'first_param_noise_actor_scope'
         print ("bla3")
         print (param_noise_actor.vars)
         self.perturbed_actor_tf = param_noise_actor(normalized_obs0)
@@ -181,7 +181,7 @@ class DDPG(object):
         # Configure separate copy for stddev adoption.
         adaptive_param_noise_actor = copy(self.actor)
         adaptive_param_noise_actor.name = 'adaptive_param_noise_actor'
-        adaptive_param_noise_actor.first_scope = '_adaptive_param_noise_actor_scope'
+        adaptive_param_noise_actor.first_scope = 'first_adaptive_param_noise_actor_scope'
         adaptive_actor_tf = adaptive_param_noise_actor(normalized_obs0)
         self.perturb_adaptive_policy_ops = get_perturbed_actor_updates(self.actor, adaptive_param_noise_actor, self.param_noise_stddev)
         self.adaptive_policy_distance = tf.sqrt(tf.reduce_mean(tf.square(self.actor_tf - adaptive_actor_tf)))
