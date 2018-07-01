@@ -26,15 +26,18 @@ class Actor(Model):
         self.nb_actions = nb_actions
         self.layer_norm = layer_norm
         self.first_scope = 'general_scope'
+        global HAS_SCOPE
+        # HAS_SCOPE[self.first_scope]
 
     def __call__(self, obs, reuse=False):
         global HAS_SCOPE
         with tf.variable_scope(self.first_scope) as scope:
-            if HAS_SCOPE:
+            if self.first_scope == 'general_scope' and HAS_SCOPE:
                 scope.reuse_variables()
-            else:
+            elif self.first_scope == 'general_scope':
                 HAS_SCOPE = True
-
+            elif reuse:
+                scope.reuse_variables()
             x = obs
             x = tf.layers.dense(x, 64)
             if self.layer_norm:
@@ -64,10 +67,12 @@ class Critic(Model):
     def __call__(self, obs, action, reuse=False):
         global HAS_SCOPE
         with tf.variable_scope(self.first_scope) as scope:
-            if HAS_SCOPE:
+            if self.first_scope == 'general_scope' and HAS_SCOPE:
                 scope.reuse_variables()
-            else:
+            elif self.first_scope == 'general_scope':
                 HAS_SCOPE = True
+            elif reuse:
+                scope.reuse_variables()
 
             x = obs
             x = tf.layers.dense(x, 64)
