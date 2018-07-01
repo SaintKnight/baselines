@@ -165,16 +165,16 @@ class DDPG(object):
         # Configure perturbed actor.
         param_noise_actor = copy(self.actor)
         print ("bla1")
-        print (perturbed_actor.vars)
+        print (param_noise_actor.vars)
         param_noise_actor.name = 'param_noise_actor'
         print ("bla2")
-        print (perturbed_actor.vars)
+        print (param_noise_actor.vars)
         param_noise_actor.first_scope = 'param_noise_actor_scope'
         print ("bla3")
-        print (perturbed_actor.vars)
+        print (param_noise_actor.vars)
         self.perturbed_actor_tf = param_noise_actor(normalized_obs0)
         print ("bla4")
-        print (perturbed_actor.vars)
+        print (param_noise_actor.vars)
         logger.info('setting up param noise')
         self.perturb_policy_ops = get_perturbed_actor_updates(self.actor, param_noise_actor, self.param_noise_stddev)
 
