@@ -1,7 +1,8 @@
 import tensorflow as tf
 import tensorflow.contrib as tc
 
-HAS_SCOPE = {}
+#HAS_SCOPE = {}
+HAS_SCOPE = False
 
 class Model(object):
     def __init__(self, name):
@@ -50,8 +51,10 @@ class Actor(Model):
             x = tf.nn.relu(x)'''
         if self.name == 'actor':
             with tf.variable_scope('sharefirst') as scope:
-                if reuse:
+                if HAS_SCOPE:
                     scope.reuse_variables()
+                else:
+                    HAS_SCOPE = True
                 x = obs
                 x = tf.layers.dense(x, 64)
                 if self.layer_norm:
@@ -109,8 +112,10 @@ class Critic(Model):
             x = tf.nn.relu(x)'''
         if self.name == 'critic':
             with tf.variable_scope('sharefirst') as scope:
-                if reuse:
+                if HAS_SCOPE:
                     scope.reuse_variables()
+                else:
+                    HAS_SCOPE = True
                 x = obs
                 x = tf.layers.dense(x, 64)
                 if self.layer_norm:
