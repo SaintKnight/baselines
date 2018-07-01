@@ -47,6 +47,8 @@ def get_target_updates(vars, target_vars, tau):
 
 
 def get_perturbed_actor_updates(actor, perturbed_actor, param_noise_stddev):
+    print (actor.vars)
+    print (perturbed_actor.vars)
     assert len(actor.vars) == len(perturbed_actor.vars)
     assert len(actor.perturbable_vars) == len(perturbed_actor.perturbable_vars)
 
@@ -123,7 +125,7 @@ class DDPG(object):
         target_actor = copy(actor)
         target_actor.name = 'target_actor'
         target_actor.first_scope = 'target_actor_scope'
-        
+
 
         self.target_actor = target_actor
         target_critic = copy(critic)
