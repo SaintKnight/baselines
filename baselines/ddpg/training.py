@@ -109,7 +109,7 @@ def train(env, nb_epochs, nb_epoch_cycles, render_eval, reward_scale, render, pa
                         if episodes >= 500:
                             print ("blablablablablablablablablablablablablablablablablablablablablablablablablablablablablabla")
                             print (epireward)
-                            break;
+                            return;
 
                 # Train.
                 epoch_actor_losses = []
